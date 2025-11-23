@@ -4,16 +4,47 @@ A modular Python web scraper that recursively fetches HTML content from web page
 
 ## Features
 
+### Core Scraping
+- **URL Fetching with pycurl**: HTTP/HTTPS request handling with SSL certificate verification
+- **HTML Parsing & Link Extraction**: Extract all anchor tag links from pages using BeautifulSoup
+- **Recursive Web Crawling**: Depth-controlled recursive crawling with visited URL tracking
+- **Domain Restriction**: Automatic filtering to stay on the same domain (configurable)
+- **Boilerplate Content Removal**: Intelligently removes navigation, headers, footers, and sidebars
+
+### Content Extraction & Filtering
+- **CSS Selector-Based Data Extraction**: Extract content by class (`.classname`), ID (`#id`), or HTML tag selectors
+- **Sublink Pattern Filtering**: Filter links by comma-separated patterns for fine-grained crawling control
+- **Custom Starting Path**: Specify a sub_path to begin scraping from specific subdirectories
+- **Fallback Content Selection**: Automatically falls back to body content if target selector not found
+
+### Output & Conversion
+- **Dual Output Modes**:
+  - Always saves cleaned HTML content to file
+  - Optionally extracts specific content using CSS selectors to separate data files
+- **HTML to Markdown Conversion**: Automatically converts collected HTML to Markdown format using MarkItDown
+- **Data Extraction to Separate Files**: Save extracted content to selector-specific files with URL source tracking
+- **UTF-8 Encoding Support**: Proper handling of character encoding in all output files
+
+### Logging & Monitoring
+- **Configurable Logging Levels**: DEBUG, INFO, WARNING, ERROR levels with formatted timestamps
+- **Progress Reporting**: Real-time progress updates and final summary statistics
+- **Component-Specific Logging**: Detailed logging from all modules for debugging
+
+### Architecture & Code Quality
 - **Modular Architecture**: Clean separation of concerns with dedicated modules for fetching, parsing, file operations, and link management
-- **Dual Output Modes**: 
-  - Always saves complete HTML content to file
-  - Optionally extracts specific content using CSS selectors
-- **Smart Content Extraction**: Intelligently handles common page structures (e.g., excludes navigation from main content)
-- **Recursive Scraping**: Follows links based on configurable depth and filters
-- **Link Filtering**: Filter links by sublink patterns and domain restrictions
-- **Structured Logging**: Configurable log levels for debugging and monitoring
-- **Markdown Conversion**: Automatically converts HTML output to Markdown format
-- **Robust Error Handling**: Graceful handling of network errors and parsing issues
+- **Multi-Module Design**: Fetcher, Parser, FileHandler, LinkManager, Config, and WebScraper modules
+- **Error Handling & Recovery**: Graceful error handling without stopping the entire crawl
+- **Memory-Efficient Processing**: Set-based storage and stream-based file operations
+
+## Advanced Features
+
+- **Smart Content Detection**: Special handling for Kubernetes/td-content div layouts and common content patterns
+- **Navigation Removal**: Automatic detection and removal of breadcrumb navigation and header elements
+- **Deep Element Copying**: Preserves original DOM structure while extracting content
+- **Whitespace Normalization**: Cleans up extracted text by normalizing whitespace
+- **Output Directory Management**: Organize scrape results in customizable output directories
+- **Selector Fallback Chain**: Intelligently falls back to alternative selectors if primary extraction fails
+- **Main Element Optimization**: Special optimized handling for `<main>` element extraction
 
 ## Architecture
 
