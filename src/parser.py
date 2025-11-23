@@ -141,3 +141,61 @@ class HTMLParser:
             breadcrumb.decompose()
 
         return main_element.get_text(separator=" ", strip=True)
+
+    def extract_main_content_html(self, soup: BeautifulSoup) -> Optional[str]:
+        """Extract cleaned main content HTML, removing boilerplate.
+
+        Removes navigation, headers, footers, scripts, and sidebars.
+        Returns only the main content area as HTML string.
+
+        Args:
+            soup: BeautifulSoup object to extract from
+
+        Returns:
+            Cleaned HTML string containing only main content, or None if not found
+        """
+        try:
+            # Try to find main element first
+            main_element = soup.find("main")
+            if main_element:
+                # Make a deep copy to avoid modifying the original
+                main_copy = BeautifulSoup(str(main_element), "html.parser")
+                main_element_copy = main_copy.find("main")
+
+                # Remove common boilerplate elements
+                for element in main_element_copy.find_all(["nav", "script", "style"]):
+                    element.decompose()
+
+                # Try to extract from td-content div for Kubernetes-style sites
+                content_div = main_element_copy.find("div", class_="td-content")
+                if content_div:
+                    self.logger.debug("Extracting from td-content div")
+                    return str(content_div)
+
+                self.logger.debug("Using full main element as cleaned content")
+                return str(main_element_copy)
+
+            # Fallback: try to find article
+            article = soup.find("article")
+            if article:
+                article_copy = BeautifulSoup(str(article), "html.parser")
+                for element in article_copy.find_all(["nav", "script", "style"]):
+                    element.decompose()
+                self.logger.debug("Using article element as cleaned content")
+                return str(article_copy)
+
+            # If no main/article found, try body but remove header/footer/nav
+            body = soup.find("body")
+            if body:
+                body_copy = BeautifulSoup(str(body), "html.parser")
+                for element in body_copy.find_all(["header", "footer", "nav", "script", "style"]):
+                    element.decompose()
+                self.logger.debug("Using body element with boilerplate removed")
+                return str(body_copy)
+
+            self.logger.warning("Could not find suitable content container")
+            return None
+
+        except Exception as e:
+            self.logger.error(f"Error extracting main content HTML: {str(e)}")
+            return None

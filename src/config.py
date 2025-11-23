@@ -12,6 +12,7 @@ class ScraperConfig:
     Attributes:
         url: Base URL to scrape
         file_name: Output HTML file name
+        output_dir: Directory to save output files
         sublinks: List of sublink filters
         sub_path: Starting path for scraping
         strict_url: Whether to enforce strict URL matching
@@ -22,6 +23,7 @@ class ScraperConfig:
 
     url: str
     file_name: str
+    output_dir: str
     sublinks: list[str]
     sub_path: str
     strict_url: bool
@@ -44,6 +46,7 @@ class ScraperConfig:
         return cls(
             url=args.url,
             file_name=args.file_name,
+            output_dir=args.output_dir,
             sublinks=sublinks,
             sub_path=args.sub_path,
             strict_url=args.strict_url,
@@ -91,6 +94,13 @@ def parse_arguments() -> argparse.Namespace:
         type=str,
         default="output.html",
         help="Output HTML file name (default: output.html)",
+    )
+
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default="output",
+        help="Directory to save output files (default: output)",
     )
 
     parser.add_argument(

@@ -4,7 +4,6 @@
 from src.config import parse_arguments, ScraperConfig
 from src.scraper import WebScraper
 
-
 def main():
     """Main entry point for the web scraper."""
     # Parse command-line arguments
@@ -19,7 +18,6 @@ def main():
     # Create and run scraper
     scraper = WebScraper(config)
     scraper.run()
-
 
 if __name__ == "__main__":
     main()

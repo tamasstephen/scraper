@@ -27,7 +27,7 @@ class WebScraper:
         # Initialize components
         self.fetcher = URLFetcher(self.logger)
         self.parser = HTMLParser(self.logger)
-        self.file_handler = FileHandler(config.file_name, self.logger)
+        self.file_handler = FileHandler(config.file_name, config.output_dir, self.logger)
         self.link_manager = LinkManager(config.sublinks, config.url, self.logger)
 
         self.depth = 0
@@ -147,11 +147,17 @@ class WebScraper:
         # Fetch HTML content
         html_content = self.fetcher.fetch(url)
 
-        # ALWAYS write to HTML file
-        self.file_handler.write_html(html_content)
-
-        # Parse HTML
+        # Parse HTML for link extraction and data extraction
         soup = self.parser.parse_html(html_content)
+
+        # Extract cleaned main content for saving
+        cleaned_html = self.parser.extract_main_content_html(soup)
+        if cleaned_html:
+            self.logger.debug("Writing cleaned main content to HTML file")
+            self.file_handler.write_html(cleaned_html)
+        else:
+            self.logger.warning(f"Could not extract main content from {url}, saving full HTML")
+            self.file_handler.write_html(html_content)
 
         # Extract and add links
         links = self.parser.extract_links(soup)

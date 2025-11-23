@@ -12,21 +12,33 @@ class FileHandler:
     Manages writing HTML content, extracted data, and markdown conversion.
     """
 
-    def __init__(self, html_file: str, logger: logging.Logger):
+    def __init__(self, html_file: str, output_dir: str, logger: logging.Logger):
         """Initialize the file handler.
 
         Args:
-            html_file: Path to the HTML output file
+            html_file: Name of the HTML output file
+            output_dir: Directory to save output files
             logger: Logger instance for logging operations
         """
-        self.html_file = html_file
+        self.output_dir = Path(output_dir)
+        self.html_file = self.output_dir / html_file
         self.logger = logger
+        self._ensure_output_dir_exists()
         self._ensure_html_file_exists()
+
+    def _ensure_output_dir_exists(self) -> None:
+        """Ensure the output directory exists."""
+        try:
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+            self.logger.debug(f"Output directory ready: {self.output_dir}")
+        except Exception as e:
+            self.logger.error(f"Failed to create output directory: {e}")
+            raise
 
     def _ensure_html_file_exists(self) -> None:
         """Ensure the HTML file exists and is empty at start."""
         try:
-            Path(self.html_file).write_text("", encoding="utf-8")
+            self.html_file.write_text("", encoding="utf-8")
             self.logger.debug(f"Initialized HTML file: {self.html_file}")
         except Exception as e:
             self.logger.warning(f"Could not initialize HTML file: {e}")
@@ -54,7 +66,7 @@ class FileHandler:
         Args:
             selector: CSS selector being used for extraction
         """
-        data_file = f"data_{selector}.txt"
+        data_file = self.output_dir / f"data_{selector}.txt"
         try:
             with open(data_file, "w", encoding="utf-8") as f:
                 f.write(f"Extracted data for selector '{selector}'\n")
@@ -73,7 +85,7 @@ class FileHandler:
             url: URL the data was extracted from
             data: Extracted text content
         """
-        data_file = f"data_{selector}.txt"
+        data_file = self.output_dir / f"data_{selector}.txt"
 
         try:
             equals_line = "=" * 80
@@ -98,10 +110,10 @@ class FileHandler:
 
         try:
             md = MarkItDown()
-            result = md.convert(self.html_file)
+            result = md.convert(str(self.html_file))
             text_result = result.text_content
 
-            output_file = self.html_file.replace(".html", ".md")
+            output_file = self.html_file.with_suffix(".md")
 
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write(text_result)

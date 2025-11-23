@@ -12,3 +12,6 @@ wheels/
 # Output files
 *.html
 .DS_Store
+
+# Output directory
+output/
